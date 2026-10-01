@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>멀티플레이어 텍사스 홀덤 포커 배틀</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; touch-action: manipulation; user-select: none; -webkit-user-select: none; overflow: hidden; background: #064e3b; box-sizing: border-box; }
+  .font-jua { font-family: 'Jua', sans-serif; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+  .poker-table {
+    background: radial-gradient(circle, #047857 0%, #065f46 60%, #022c22 100%);
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+  }
+  .card-glow {
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen w-screen flex flex-col justify-between p-2 sm:p-3 overflow-hidden">
+
+<div id="customModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+  <div class="bg-slate-900 border border-emerald-500/50 rounded-2xl p-5 max-w-sm w-full text-center shadow-2xl">
+    <div id="modalIcon" class="text-3xl mb-2">💬</div>
+    <h3 id="customModalTitle" class="text-base font-black text-emerald-400 font-jua mb-1">알림</h3>
+    <p id="customModalDesc" class="text-xs text-slate-300 mb-4">내용이 여기에 들어갑니다.</p>
+    <button id="customModalBtn" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl font-jua text-xs active:scale-95 transition">확인</button>
+  </div>
+</div>
+
+<div id="lobbyOverlay" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-4 z-40">
+  <div class="bg-slate-900 border-2 border-emerald-500/50 rounded-3xl p-6 max-w-md w-full shadow-2xl text-center space-y-4">
+    <div class="text-4xl">♠♥️</div>
+    <h1 class="text-xl font-black text-emerald-400 font-jua">텍사스 홀덤 포커 배틀</h1>
+    <p class="text-xs text-slate-400">멀티플레이어 또는 스마트 AI와 함께 즐기는 홀덤!</p>
+    
+    <div class="space-y-3 text-left bg-slate-950 p-4 rounded-2xl border border-slate-800">
+      <div>
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">플레이어 닉네임</label>
+        <input type="text" id="inputNickname" value="포커고수" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+      </div>
+      <div id="multiplayerSettings">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">포커 방 번호 (코드 공유)</label>
+        <div class="flex gap-2">
+          <input type="text" id="inputRoomId" value="poker-room-01" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500">
+          <button id="joinRoomBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-3 py-2 rounded-xl font-jua text-xs transition">멀티 입장</button>
+        </div>
+      </div>
+      <div class="pt-2 border-t border-slate-800">
+        <button id="vsAiBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 rounded-xl font-jua text-xs transition shadow-lg">🤖 AI와 혼자 하기 (싱글 모드)</button>
+      </div>
+    </div>
+    <div id="lobbyStatus" class="text-xs text-amber-400 font-mono">준비 완료</div>
+  </div>
+</div>
+
+<header class="w-full bg-slate-900/95 border-b border-emerald-500/40 px-3 py-1.5 rounded-2xl flex items-center justify-between gap-2 text-xs shrink-0 shadow-lg">
+  <div class="flex items-center gap-2 shrink-0">
+    <span class="text-xl">🃏</span>
+    <h1 class="font-black text-emerald-400 font-jua text-sm sm:text-base whitespace-nowrap">홀덤 포커 배틀</h1>
+    <span id="roomBadge" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-mono">모드: 대기 중</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button id="leaveRoomBtn" class="bg-rose-900/60 hover:bg-rose-800 text-rose-300 font-bold px-2.5 py-1 rounded-xl border border-rose-700 text-xs">로비로</button>
+  </div>
+</header>
+
+<main class="flex-1 w-full flex flex-col justify-between my-2 min-h-0 gap-2">
+  <div class="flex-1 poker-table rounded-3xl border-4 border-amber-600/60 relative flex flex-col items-center justify-between p-4 overflow-hidden">
+    
+    <div class="bg-slate-950/80 border border-amber-500/50 px-4 py-2 rounded-2xl text-center shadow-xl z-20 mt-1">
+      <div class="text-[11px] text-amber-400 font-jua">총 팟 (POT)</div>
+      <div id="potAmount" class="text-xl font-black font-mono text-emerald-300">$0</div>
+      <div id="gamePhaseText" class="text-[10px] text-slate-300 font-mono">대기 중...</div>
+    </div>
+
+    <!-- Community Cards positioned precisely lower in the middle-center -->
+    <div class="flex flex-col items-center gap-1 z-20 my-auto mt-24">
+      <div class="text-[11px] text-amber-300/90 font-jua uppercase tracking-wider drop-shadow">공용 카드 (Community Cards)</div>
+      <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2.5 min-h-[90px] items-center">
+        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+      </div>
+    </div>
+
+    <div id="playersSeatArea" class="absolute inset-0 pointer-events-none p-3 flex flex-col justify-between items-center">
+      <!-- Dynamically filled by JS -->
+    </div>
+
+  </div>
+
+  <div id="actionControlBar" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 shrink-0 shadow-lg">
+    <div class="flex items-center gap-2">
+      <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-4 py-2 rounded-xl font-jua text-xs shadow transition active:scale-95">게임 시작 / 딜</button>
+      <span id="turnIndicator" class="text-xs text-amber-400 font-jua">내 차례 기다리는 중...</span>
+    </div>
+    
+    <div id="bettingControls" class="flex items-center gap-1.5 hidden">
+      <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-3 py-2 rounded-xl font-jua text-xs transition">다이 (Fold)</button>
+      <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-3 py-2 rounded-xl font-jua text-xs transition">콜 / 체크 (Call)</button>
+      <div class="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-xl border border-slate-800">
+        <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-16 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
+        <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg font-jua text-xs transition">레이즈</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCl8PfDXVj1qLVt1TcxqHt_qymY7X43zAI",
+  authDomain: "stock-game-768.firebaseapp.com",
+  projectId: "stock-game-768",
+  storageBucket: "stock-game-768.firebasestorage.app",
+  messagingSenderId: "89845431802",
+  appId: "1:89845431802:web:517763d2ba33bf4432b843"
+};
+
+let db = null, currentUserId = null;
+let appId = typeof __app_id !== 'undefined' ? __app_id : 'poker-battle-v1';
+let currentRoomId = 'poker-room-01';
+let unsubscribeRoom = null;
+let isAiMode = false;
+let localAiGameState = null;
+
+const suits = ['♠', '♥', '♦', '♣'];
+const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const rankValues = { '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, 'J':11, 'Q':12, 'K':13, 'A':14 };
+
+function showModal(title, desc, icon="💬") {
+  document.getElementById("customModalTitle").innerText = title;
+  document.getElementById("customModalDesc").innerText = desc;
+  document.getElementById("modalIcon").innerText = icon;
+  document.getElementById("customModal").classList.remove("hidden");
+  document.getElementById("customModal").classList.add("flex");
+}
+
+document.getElementById("customModalBtn").onclick = () => {
+  document.getElementById("customModal").classList.add("hidden");
+  document.getElementById("customModal").classList.remove("flex");
+};
+
+function initFirebaseApp() {
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    
+    let storedId = localStorage.getItem('poker_user_id');
+    if (!storedId) {
+      storedId = 'user_' + Math.random().toString(36).substring(2, 11);
+      localStorage.setItem('poker_user_id', storedId);
+    }
+    currentUserId = storedId;
+    document.getElementById("lobbyStatus").innerText = "Firebase 클라우드 연동 완료!";
+  } catch (err) {
+    console.error("Firebase init error:", err);
+    document.getElementById("lobbyStatus").innerText = "오프라인 모드 활성화";
+  }
+}
+initFirebaseApp();
+
+function evaluateHand(playerCards, communityCards) {
+  const allCards = [...playerCards, ...communityCards];
+  if (allCards.length < 5) return { score: 0, name: '카드 부족' };
+
+  let bestScore = -1;
+  let bestName = '';
+
+  const combinations = getCombinations(allCards, 5);
+  for (let combo of combinations) {
+    const result = evaluateFiveCards(combo);
+    if (result.score > bestScore) {
+      bestScore = result.score;
+      bestName = result.name;
+    }
+  }
+  return { score: bestScore, name: bestName };
+}
+
+function getCombinations(arr, k) {
+  if (k === 0) return [[]];
+  if (arr.length === 0) return [];
+  const head = arr[0];
+  const tail = arr.slice(1);
+  const withHead = getCombinations(tail, k - 1).map(c => [head, ...c]);
+  const withoutHead = getCombinations(tail, k);
+  return [...withHead, ...withoutHead];
+}
+
+function evaluateFiveCards(cards) {
+  const values = cards.map(c => rankValues[c.rank]).sort((a, b) => b - a);
+  const suitsArr = cards.map(c => c.suit);
+  const isFlush = suitsArr.every(s => s === suitsArr[0]);
+
+  let isStraight = false;
+  let uniqueValues = [...new Set(values)];
+  if (uniqueValues.length === 5) {
+    if (uniqueValues[0] - uniqueValues[4] === 4) {
+      isStraight = true;
+    }
+    if (uniqueValues[0] === 14 && uniqueValues[1] === 5 && uniqueValues[2] === 4 && uniqueValues[3] === 3 && uniqueValues[4] === 2) {
+      isStraight = true;
+    }
+  }
+
+  const counts = {};
+  values.forEach(v => counts[v] = (counts[v] || 0) + 1);
+  const countPairs = Object.entries(counts)
+    .map(([val, cnt]) => ({ val: Number(val), cnt }))
+    .sort((a, b) => b.cnt - a.cnt || b.val - a.val);
+
+  if (isFlush && isStraight) return { score: 8000000 + values[0], name: '스트레이트 플러시' };
+  if (countPairs[0].cnt === 4) return { score: 7000000 + countPairs[0].val, name: '포카드 (Four of a Kind)' };
+  if (countPairs[0].cnt === 3 && countPairs[1] && countPairs[1].cnt === 2) return { score: 6000000 + countPairs[0].val, name: '풀하우스 (Full House)' };
+  if (isFlush) return { score: 5000000 + values[0], name: '플러시 (Flush)' };
+  if (isStraight) return { score: 4000000 + values[0], name: '스트레이트 (Straight)' };
+  if (countPairs[0].cnt === 3) return { score: 3000000 + countPairs[0].val, name: '트리플 (Three of a Kind)' };
+  if (countPairs[0].cnt === 2 && countPairs[1] && countPairs[1].cnt === 2) {
+    if (countPairs[1].cnt === 2 && countPairs[0].val !== countPairs[1].val) {
+      let highPair = Math.max(countPairs[0].val, countPairs[1].val);
+      let lowPair = Math.min(countPairs[0].val, countPairs[1].val);
+      return { score: 2000000 + highPair * 100 + lowPair, name: '투페어 (Two Pair)' };
+    }
+  }
+  if (countPairs[0].cnt === 2) return { score: 1000000 + countPairs[0].val, name: `원페어 (${ranks.find(r => rankValues[r] === countPairs[0].val) || ''})` };
+
+  return { score: values[0], name: `하이카드 (${cards[0].rank})` };
+}
+
+document.getElementById("joinRoomBtn").onclick = async () => {
+  const nickname = document.getElementById("inputNickname").value.trim() || "플레이어";
+  const roomIdInput = document.getElementById("inputRoomId").value.trim() || "poker-room-01";
+  
+  if (!db || !currentUserId) {
+    showModal("오류", "Firebase가 연결되지 않았습니다.", "⚠️");
+    return;
+  }
+
+  isAiMode = false;
+  currentRoomId = roomIdInput;
+  document.getElementById("roomBadge").innerText = `멀티방: ${currentRoomId}`;
+  document.getElementById("lobbyOverlay").classList.add("hidden");
+
+  const roomRef = doc(db, 'artifacts', appId, 'poker_rooms', currentRoomId);
+  const snap = await getDoc(roomRef);
+
+  if (!snap.exists()) {
+    await setDoc(roomRef, {
+      pot: 0,
+      phase: 'waiting',
+      currentTurnIndex: 0,
+      currentHighestBet: 0,
+      communityCards: [],
+      players: [{
+        id: currentUserId,
+        name: nickname,
+        chips: 1000,
+        bet: 0,
+        cards: [],
+        status: 'active',
+        isHost: true
+      }]
+    });
+  } else {
+    const data = snap.data();
+    let players = data.players || [];
+    let existing = players.find(p => p.id === currentUserId);
+    if (!existing) {
+      players.push({
+        id: currentUserId,
+        name: nickname,
+        chips: 1000,
+        bet: 0,
+        cards: [],
+        status: 'active',
+        isHost: players.length === 0
+      });
+      await updateDoc(roomRef, { players });
+    }
+  }
+
+  subscribeRoomData();
+};
+
+document.getElementById("vsAiBtn").onclick = () => {
+  const nickname = document.getElementById("inputNickname").value.trim() || "플레이어";
+  isAiMode = true;
+  document.getElementById("roomBadge").innerText = "모드: 싱글 AI 배틀";
+  document.getElementById("lobbyOverlay").classList.add("hidden");
+
+  localAiGameState = {
+    pot: 0,
+    phase: 'waiting',
+    currentTurnIndex: 0,
+    currentHighestBet: 0,
+    communityCards: [],
+    players: [
+      { id: currentUserId, name: nickname, chips: 1000, bet: 0, cards: [], status: 'active' },
+      { id: 'ai_bot_1', name: '🤖 딥블루 (AI)', chips: 1000, bet: 0, cards: [], status: 'active' },
+      { id: 'ai_bot_2', name: '🤖 알파포커 (AI)', chips: 1000, bet: 0, cards: [], status: 'active' }
+    ]
+  };
+
+  renderGame(localAiGameState);
+};
+
+document.getElementById("leaveRoomBtn").onclick = () => {
+  if (unsubscribeRoom) unsubscribeRoom();
+  document.getElementById("lobbyOverlay").classList.remove("hidden");
+};
+
+function subscribeRoomData() {
+  if (!db || isAiMode) return;
+  const roomRef = doc(db, 'artifacts', appId, 'poker_rooms', currentRoomId);
+  unsubscribeRoom = onSnapshot(roomRef, (docSnap) => {
+    if (!docSnap.exists()) return;
+    renderGame(docSnap.data());
+  }, (err) => {
+    console.error("Room sync error:", err);
+  });
+}
+
+function renderGame(data) {
+  if (!data) return;
+  document.getElementById("potAmount").innerText = `$${data.pot || 0}`;
+  let phaseNameKR = '대기 중';
+  if (data.phase === 'preflop') phaseNameKR = '프리플랍 (베팅)';
+  else if (data.phase === 'flop') phaseNameKR = '플랍 (공유카드 3장)';
+  else if (data.phase === 'turn') phaseNameKR = '턴 (공유카드 4장)';
+  else if (data.phase === 'river') phaseNameKR = '리버 (공유카드 5장)';
+  else if (data.phase === 'showdown') phaseNameKR = '쇼다운 (결과 발표)';
+  document.getElementById("gamePhaseText").innerText = `진행 단계: ${phaseNameKR}`;
+
+  const commContainer = document.getElementById("communityCardsContainer");
+  commContainer.innerHTML = "";
+  const commCards = data.communityCards || [];
+  
+  let visibleCommCount = 0;
+  if (data.phase === 'flop') visibleCommCount = 3;
+  else if (data.phase === 'turn') visibleCommCount = 4;
+  else if (data.phase === 'river' || data.phase === 'showdown') visibleCommCount = 5;
+
+  for (let i = 0; i < 5; i++) {
+    if (commCards[i] && i < visibleCommCount) {
+      const c = commCards[i];
+      const isRed = c.suit === '♥' || c.suit === '♦';
+      commContainer.innerHTML += `
+        <div class="w-16 h-22 sm:w-20 sm:h-28 bg-white border border-slate-300 rounded-xl flex flex-col items-center justify-between p-2 card-glow ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-base sm:text-lg shadow-xl transition transform hover:-translate-y-1">
+          <div>${c.rank}</div>
+          <div class="text-3xl sm:text-4xl">${c.suit}</div>
+          <div class="rotate-180">${c.rank}</div>
+        </div>
+      `;
+    } else {
+      commContainer.innerHTML += `<div class="w-16 h-22 sm:w-20 sm:h-28 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>`;
+    }
+  }
+
+  const seatArea = document.getElementById("playersSeatArea");
+  seatArea.innerHTML = "";
+  const players = data.players || [];
+  
+  players.forEach((p, idx) => {
+    const isMe = currentUserId && p.id === currentUserId;
+    const isCurrentTurn = data.currentTurnIndex === idx;
+    const showCards = isMe || data.phase === 'showdown';
+    
+    let handInfo = { name: '비공개' };
+    if (showCards && p.cards && p.cards.length === 2 && commCards.length === 5) {
+      handInfo = evaluateHand(p.cards, commCards);
+    }
+
+    let cardsHtml = '';
+    if (showCards && p.cards) {
+      cardsHtml = p.cards.map(c => {
+        const isRed = c.suit === '♥' || c.suit === '♦';
+        if (isMe) {
+          return `<div class="w-24 h-34 sm:w-28 sm:h-40 bg-white border-2 border-amber-400 rounded-2xl flex flex-col items-center justify-between p-3 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xl sm:text-2xl shadow-2xl card-glow"><div>${c.rank}</div><div class="text-5xl sm:text-6xl">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+        } else {
+          return `<div class="w-12 h-16 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs shadow-md"><div>${c.rank}</div><div class="text-lg">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+        }
+      }).join('');
+    } else {
+      if (isMe) {
+        cardsHtml = `<div class="w-24 h-34 sm:w-28 sm:h-40 bg-slate-800/90 border border-slate-700 rounded-2xl flex items-center justify-center text-slate-400 text-lg font-mono shadow-xl">🂠🂠</div>`;
+      } else {
+        cardsHtml = `<div class="w-12 h-16 sm:w-14 sm:h-20 bg-slate-800/90 border border-slate-700 rounded-lg flex items-center justify-center text-slate-400 text-xs font-mono shadow">🂠🂠</div>`;
+      }
+    }
+
+    let posClass = "absolute bottom-2 left-1/2 -translate-x-1/2"; 
+    let boxWidth = "w-72 sm:w-80";
+    if (!isMe) {
+      boxWidth = "w-36 sm:w-44";
+      if (players.length === 3) {
+        if (idx === 1) posClass = "absolute top-16 left-3 sm:left-8"; 
+        else if (idx === 2) posClass = "absolute top-16 right-3 sm:right-8"; 
+      } else {
+        if (idx % 2 === 1) posClass = `absolute top-16 left-3`;
+        else posClass = `absolute top-16 right-3`;
+      }
+    }
+
+    seatArea.innerHTML += `
+      <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-4 ring-amber-400/50 scale-105' : 'border-slate-800'} rounded-2xl p-2.5 sm:p-3 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
+        <div class="flex items-center justify-between text-[11px] sm:text-xs">
+          <span class="font-jua text-emerald-400 truncate">${p.name} ${isMe ? '(나)' : ''}</span>
+          <span class="font-mono text-amber-300 font-bold">$${p.chips}</span>
+        </div>
+        <div class="flex items-center justify-center gap-2 my-1.5">
+          ${cardsHtml}
+        </div>
+        <div class="text-center text-[10px] sm:text-xs text-amber-400 font-jua truncate">
+          ${showCards ? handInfo.name : '비공개 카드'}
+        </div>
+        <div class="flex items-center justify-between text-[10px] sm:text-xs text-slate-300 border-t border-slate-800 pt-1 mt-0.5">
+          <span>벳: $${p.bet || 0}</span>
+          <span class="${p.status === 'folded' ? 'text-rose-400' : 'text-emerald-400'} font-bold">${p.status}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  const myIndex = players.findIndex(p => currentUserId && p.id === currentUserId);
+  const isMyTurn = myIndex !== -1 && data.currentTurnIndex === myIndex && data.phase !== 'waiting' && data.phase !== 'showdown';
+  
+  const bettingControls = document.getElementById("bettingControls");
+  const turnIndicator = document.getElementById("turnIndicator");
+  const startHandBtn = document.getElementById("startHandBtn");
+
+  if (isMyTurn) {
+    bettingControls.classList.remove("hidden");
+    turnIndicator.innerText = "내 차례입니다!";
+    turnIndicator.className = "text-xs text-emerald-400 font-jua animate-pulse";
+  } else {
+    bettingControls.classList.add("hidden");
+    const currP = players[data.currentTurnIndex];
+    turnIndicator.innerText = currP ? `${currP.name}님의 차례...` : "대기 중";
+    turnIndicator.className = "text-xs text-amber-400 font-jua";
+
+    if (isAiMode && currP && currP.id.startsWith('ai_bot') && data.phase !== 'waiting' && data.phase !== 'showdown') {
+      setTimeout(runAiTurn, 1000);
+    }
+  }
+
+  startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'block' : 'none';
+}
+
+function createDeck() {
+  let deck = [];
+  for (let s of suits) {
+    for (let r of ranks) {
+      deck.push({ suit: s, rank: r });
+    }
+  }
+  return deck.sort(() => Math.random() - 0.5);
+}
+
+document.getElementById("startHandBtn").onclick = async () => {
+  let deck = createDeck();
+  let pot = 0;
+
+  if (isAiMode) {
+    if (!localAiGameState) return;
+    let players = localAiGameState.players;
+    players.forEach(p => {
+      p.cards = [deck.pop(), deck.pop()];
+      let ante = Math.min(10, p.chips);
+      p.chips -= ante;
+      p.bet = ante;
+      pot += ante;
+      p.status = 'active';
+    });
+
+    localAiGameState.pot = pot;
+    localAiGameState.phase = 'preflop';
+    localAiGameState.currentTurnIndex = 0;
+    localAiGameState.currentHighestBet = 10;
+    localAiGameState.communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+    localAiGameState.lastRaiserIndex = -1;
+    localAiGameState.actionsTakenThisRound = 0;
+
+    renderGame(localAiGameState);
+  } else {
+    if (!db) return;
+    const roomRef = doc(db, 'artifacts', appId, 'poker_rooms', currentRoomId);
+    const snap = await getDoc(roomRef);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    let players = data.players || [];
+
+    if (players.length < 1) {
+      showModal("알림", "참여한 플레이어가 없습니다.", "⚠️");
+      return;
+    }
+
+    players.forEach(p => {
+      p.cards = [deck.pop(), deck.pop()];
+      let ante = Math.min(10, p.chips);
+      p.chips -= ante;
+      p.bet = ante;
+      pot += ante;
+      p.status = 'active';
+    });
+
+    let communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+
+    await updateDoc(roomRef, {
+      pot: pot,
+      phase: 'preflop',
+      currentTurnIndex: 0,
+      currentHighestBet: 10,
+      communityCards: communityCards,
+      players: players,
+      lastRaiserIndex: -1,
+      actionsTakenThisRound: 0
+    });
+  }
+};
+
+async function runAiTurn() {
+  if (!isAiMode || !localAiGameState) return;
+  let data = localAiGameState;
+  if (data.phase === 'waiting' || data.phase === 'showdown') return;
+  let turnIdx = data.currentTurnIndex;
+  let p = data.players[turnIdx];
+  if (!p || !p.id.startsWith('ai_bot')) return;
+
+  let diff = data.currentHighestBet - p.bet;
+  let action = 'call';
+  let raiseVal = 0;
+
+  const rand = Math.random();
+  if (diff > 150 && rand < 0.4) {
+    action = 'fold';
+  } else if (rand < 0.15 && p.chips > 100 && (data.actionsTakenThisRound || 0) < 3) {
+    action = 'raise';
+    raiseVal = 20;
+  } else {
+    action = 'call';
+  }
+
+  await applyActionAndProceed(action, raiseVal);
+}
+
+document.getElementById("foldBtn").onclick = async () => { await handlePlayerAction('fold', 0); };
+document.getElementById("checkCallBtn").onclick = async () => { await handlePlayerAction('call', 0); };
+document.getElementById("raiseBtn").onclick = async () => {
+  const amount = parseInt(document.getElementById("raiseAmountInput").value) || 30;
+  await handlePlayerAction('raise', amount);
+};
+
+async function handlePlayerAction(action, amount) {
+  if (isAiMode) {
+    if (!localAiGameState) return;
+    let p = localAiGameState.players[localAiGameState.currentTurnIndex];
+    if (!currentUserId || p.id !== currentUserId) return;
+    await applyActionAndProceed(action, amount);
+  } else {
+    if (!db) return;
+    const roomRef = doc(db, 'artifacts', appId, 'poker_rooms', currentRoomId);
+    const snap = await getDoc(roomRef);
+    if (!snap.exists()) return;
+    let data = snap.data();
+    let players = data.players || [];
+    let turnIdx = data.currentTurnIndex;
+    let p = players[turnIdx];
+
+    if (!currentUserId || p.id !== currentUserId) return;
+    executeActionOnData(data, action, amount);
+    await updateDoc(roomRef, data);
+  }
+}
+
+async function applyActionAndProceed(action, amount) {
+  let data = localAiGameState;
+  if (!data) return;
+  executeActionOnData(data, action, amount);
+  renderGame(data);
+}
+
+function executeActionOnData(data, action, amount) {
+  let players = data.players;
+  let turnIdx = data.currentTurnIndex;
+  let p = players[turnIdx];
+
+  if (action === 'fold') {
+    p.status = 'folded';
+  } else if (action === 'call') {
+    let diff = data.currentHighestBet - p.bet;
+    let pay = Math.min(diff, p.chips);
+    p.chips -= pay;
+    p.bet += pay;
+    data.pot += pay;
+  } else if (action === 'raise') {
+    let totalBet = data.currentHighestBet + amount;
+    let diff = totalBet - p.bet;
+    let pay = Math.min(diff, p.chips);
+    p.chips -= pay;
+    p.bet += pay;
+    data.pot += pay;
+    data.currentHighestBet = p.bet;
+  }
+
+  let activePlayers = players.filter(pl => pl.status === 'active');
+  
+  if (activePlayers.length <= 1) {
+    let winner = activePlayers[0] || players[0];
+    winner.chips += data.pot;
+    showModal("🎉 게임 종료 (폴드 승리)", `승자: ${winner.name}\n획득 상금: $${data.pot}`, "🏆");
+    data.phase = 'showdown';
+    return;
+  }
+
+  // Find next active player
+  let nextIdx = (turnIdx + 1) % players.length;
+  let loopCount = 0;
+  while (players[nextIdx].status === 'folded' && loopCount < players.length) {
+    nextIdx = (nextIdx + 1) % players.length;
+    loopCount++;
+  }
+
+  data.currentTurnIndex = nextIdx;
+
+  // Check if all active players have matched the highest bet (Round completion check)
+  let allMatched = activePlayers.every(pl => pl.bet === data.currentHighestBet);
+
+  if (allMatched) {
+    if (data.phase === 'preflop') {
+      data.phase = 'flop';
+      resetBetsForNextRound(players, data);
+    } else if (data.phase === 'flop') {
+      data.phase = 'turn';
+      resetBetsForNextRound(players, data);
+    } else if (data.phase === 'turn') {
+      data.phase = 'river';
+      resetBetsForNextRound(players, data);
+    } else if (data.phase === 'river') {
+      let bestScore = -1;
+      let winner = activePlayers[0];
+      let bestHandName = '';
+
+      activePlayers.forEach(pl => {
+        let evalRes = evaluateHand(pl.cards, data.communityCards);
+        if (evalRes.score > bestScore) {
+          bestScore = evalRes.score;
+          winner = pl;
+          bestHandName = evalRes.name;
+        }
+      });
+
+      if (winner) {
+        winner.chips += data.pot;
+        showModal("🏆 최종 쇼다운 결과", `승자: ${winner.name}!\n최고 족보: ${bestHandName}\n획득 상금: $${data.pot}`, "👑");
+      }
+      data.phase = 'showdown';
+    }
+  }
+}
+
+function resetBetsForNextRound(players, data) {
+  players.forEach(p => {
+    if (p.status === 'active') p.bet = 0;
+  });
+  data.currentHighestBet = 0;
+  let firstActive = players.findIndex(p => p.status === 'active');
+  if (firstActive !== -1) data.currentTurnIndex = firstActive;
+}
+</script>
+</body>
+</html>
