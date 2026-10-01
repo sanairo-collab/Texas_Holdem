@@ -72,15 +72,15 @@
 <main class="flex-1 w-full flex flex-col justify-between my-1 sm:my-2 min-h-0 gap-1.5 sm:gap-2">
   <div class="flex-1 poker-table rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-amber-600/60 relative flex flex-col items-center justify-between p-1.5 sm:p-4 overflow-hidden">
     
-    <!-- Top area holding both Pot and Community Cards in a non-overlapping column stack with generous spacing -->
-    <div class="flex flex-col items-center gap-3 w-full z-20 mt-2 sm:mt-4 shrink-0">
+    <!-- Top area holding both Pot and Community Cards pushed down below opponent card boxes -->
+    <div class="flex flex-col items-center gap-1.5 w-full z-20 mt-14 sm:mt-24 shrink-0">
       <div class="bg-slate-950/85 border border-amber-500/50 px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl sm:rounded-2xl text-center shadow-xl">
         <div class="text-[9px] sm:text-[11px] text-amber-400 font-jua">총 팟 (POT)</div>
         <div id="potAmount" class="text-sm sm:text-xl font-black font-mono text-emerald-300">$0</div>
         <div id="gamePhaseText" class="text-[8px] sm:text-[10px] text-slate-300 font-mono">대기 중...</div>
       </div>
 
-      <div class="flex flex-col items-center gap-1">
+      <div class="flex flex-col items-center gap-1 mt-1">
         <div class="text-[9px] sm:text-[11px] text-amber-300/90 font-jua uppercase tracking-wider drop-shadow">공용 카드 (Community Cards)</div>
         <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2 min-h-[44px] sm:min-h-[90px] items-center">
           <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
