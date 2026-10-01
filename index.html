@@ -69,45 +69,47 @@
   </div>
 </header>
 
-<main class="flex-1 w-full flex flex-col justify-between my-2 min-h-0 gap-2">
-  <div class="flex-1 poker-table rounded-3xl border-4 border-amber-600/60 relative flex flex-col items-center justify-between p-4 overflow-hidden">
+<main class="flex-1 w-full flex flex-col justify-between my-1 sm:my-2 min-h-0 gap-1.5 sm:gap-2">
+  <div class="flex-1 poker-table rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-amber-600/60 relative flex flex-col items-center justify-between p-1.5 sm:p-4 overflow-hidden">
     
-    <div class="bg-slate-950/80 border border-amber-500/50 px-4 py-2 rounded-2xl text-center shadow-xl z-20 mt-1">
-      <div class="text-[11px] text-amber-400 font-jua">총 팟 (POT)</div>
-      <div id="potAmount" class="text-xl font-black font-mono text-emerald-300">$0</div>
-      <div id="gamePhaseText" class="text-[10px] text-slate-300 font-mono">대기 중...</div>
-    </div>
+    <!-- Top area holding both Pot and Community Cards in a non-overlapping column stack with generous spacing -->
+    <div class="flex flex-col items-center gap-3 w-full z-20 mt-2 sm:mt-4 shrink-0">
+      <div class="bg-slate-950/85 border border-amber-500/50 px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl sm:rounded-2xl text-center shadow-xl">
+        <div class="text-[9px] sm:text-[11px] text-amber-400 font-jua">총 팟 (POT)</div>
+        <div id="potAmount" class="text-sm sm:text-xl font-black font-mono text-emerald-300">$0</div>
+        <div id="gamePhaseText" class="text-[8px] sm:text-[10px] text-slate-300 font-mono">대기 중...</div>
+      </div>
 
-    <!-- Community Cards positioned precisely lower in the middle-center -->
-    <div class="flex flex-col items-center gap-1 z-20 my-auto mt-24">
-      <div class="text-[11px] text-amber-300/90 font-jua uppercase tracking-wider drop-shadow">공용 카드 (Community Cards)</div>
-      <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2.5 min-h-[90px] items-center">
-        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
-        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
-        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
-        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
-        <div class="w-14 h-20 sm:w-18 sm:h-24 bg-slate-800/80 border border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-sm font-mono shadow-xl">?</div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-[9px] sm:text-[11px] text-amber-300/90 font-jua uppercase tracking-wider drop-shadow">공용 카드 (Community Cards)</div>
+        <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2 min-h-[44px] sm:min-h-[90px] items-center">
+          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+        </div>
       </div>
     </div>
 
-    <div id="playersSeatArea" class="absolute inset-0 pointer-events-none p-3 flex flex-col justify-between items-center">
+    <div id="playersSeatArea" class="absolute inset-0 pointer-events-none p-1 sm:p-3 flex flex-col justify-between items-center">
       <!-- Dynamically filled by JS -->
     </div>
 
   </div>
 
-  <div id="actionControlBar" class="bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 shrink-0 shadow-lg">
+  <div id="actionControlBar" class="bg-slate-900/95 border border-slate-800 rounded-xl sm:rounded-2xl p-2 sm:p-3 flex flex-wrap items-center justify-between gap-2 shrink-0 shadow-lg">
     <div class="flex items-center gap-2">
-      <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-4 py-2 rounded-xl font-jua text-xs shadow transition active:scale-95">게임 시작 / 딜</button>
+      <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-jua text-xs shadow transition active:scale-95">게임 시작 / 딜</button>
       <span id="turnIndicator" class="text-xs text-amber-400 font-jua">내 차례 기다리는 중...</span>
     </div>
     
     <div id="bettingControls" class="flex items-center gap-1.5 hidden">
-      <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-3 py-2 rounded-xl font-jua text-xs transition">다이 (Fold)</button>
-      <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-3 py-2 rounded-xl font-jua text-xs transition">콜 / 체크 (Call)</button>
+      <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-xs transition">다이 (Fold)</button>
+      <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-xs transition">콜 / 체크 (Call)</button>
       <div class="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-xl border border-slate-800">
-        <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-16 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
-        <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg font-jua text-xs transition">레이즈</button>
+        <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-14 sm:w-16 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
+        <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg font-jua text-xs transition">레이즈</button>
       </div>
     </div>
   </div>
@@ -351,14 +353,14 @@ function renderGame(data) {
       const c = commCards[i];
       const isRed = c.suit === '♥' || c.suit === '♦';
       commContainer.innerHTML += `
-        <div class="w-11 h-16 sm:w-16 sm:h-22 md:w-20 md:h-28 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-between p-1 sm:p-2 card-glow ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-base md:text-lg shadow-xl">
+        <div class="w-9 h-13 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-sm shadow-xl">
           <div>${c.rank}</div>
-          <div class="text-xl sm:text-3xl md:text-4xl">${c.suit}</div>
+          <div class="text-base sm:text-2xl">${c.suit}</div>
           <div class="rotate-180">${c.rank}</div>
         </div>
       `;
     } else {
-      commContainer.innerHTML += `<div class="w-11 h-16 sm:w-16 sm:h-22 md:w-20 md:h-28 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-xs font-mono shadow-xl">?</div>`;
+      commContainer.innerHTML += `<div class="w-9 h-13 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>`;
     }
   }
 
@@ -381,45 +383,46 @@ function renderGame(data) {
       cardsHtml = p.cards.map(c => {
         const isRed = c.suit === '♥' || c.suit === '♦';
         if (isMe) {
-          return `<div class="w-16 h-24 sm:w-22 sm:h-32 md:w-28 md:h-40 bg-white border-2 border-amber-400 rounded-xl flex flex-col items-center justify-between p-1.5 sm:p-2.5 md:p-3 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-sm sm:text-xl md:text-2xl shadow-2xl card-glow"><div>${c.rank}</div><div class="text-3xl sm:text-5xl md:text-6xl">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+          return `<div class="w-14 h-18 sm:w-20 sm:h-26 bg-white border-2 border-amber-400 rounded-lg flex flex-col items-between justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-lg shadow-xl card-glow"><div>${c.rank}</div><div class="text-xl sm:text-3xl text-center my-auto">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
         } else {
-          return `<div class="w-10 h-14 sm:w-12 sm:h-16 md:w-14 md:h-20 bg-white border border-slate-300 rounded-md flex flex-col items-center justify-between p-0.5 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow-md"><div>${c.rank}</div><div class="text-sm sm:text-lg">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+          // Fixed taller vertical height for opponent revealed cards to prevent text clipping
+          return `<div class="w-9 h-16 sm:w-12 sm:h-20 bg-white border border-slate-300 rounded-md flex flex-col items-between justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow"><div>${c.rank}</div><div class="text-sm sm:text-base text-center my-auto">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
         }
       }).join('');
     } else {
       if (isMe) {
-        cardsHtml = `<div class="w-16 h-24 sm:w-22 sm:h-32 md:w-28 md:h-40 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-center text-slate-400 text-sm sm:text-lg font-mono shadow-xl">🂠🂠</div>`;
+        cardsHtml = `<div class="w-14 h-18 sm:w-20 sm:h-26 bg-slate-800/90 border border-slate-700 rounded-lg flex items-center justify-center text-slate-400 text-xs sm:text-base font-mono shadow-xl">🂠🂠</div>`;
       } else {
-        cardsHtml = `<div class="w-10 h-14 sm:w-12 sm:h-16 md:w-14 md:h-20 bg-slate-800/90 border border-slate-700 rounded-md flex items-center justify-center text-slate-400 text-[10px] font-mono shadow">🂠🂠</div>`;
+        cardsHtml = `<div class="w-9 h-16 sm:w-12 sm:h-20 bg-slate-800/90 border border-slate-700 rounded-md flex items-center justify-center text-slate-400 text-[9px] font-mono shadow">🂠🂠</div>`;
       }
     }
 
     let posClass = "absolute bottom-1 left-1/2 -translate-x-1/2 max-w-[95%]"; 
-    let boxWidth = "w-56 sm:w-72 md:w-80";
+    let boxWidth = "w-44 sm:w-68";
     if (!isMe) {
-      boxWidth = "w-28 sm:w-36 md:w-44";
+      boxWidth = "w-24 sm:w-36";
       if (players.length === 3) {
-        if (idx === 1) posClass = "absolute top-12 left-1.5 sm:left-4 md:left-8"; 
-        else if (idx === 2) posClass = "absolute top-12 right-1.5 sm:right-4 md:right-8"; 
+        if (idx === 1) posClass = "absolute top-10 left-1 sm:left-3"; 
+        else if (idx === 2) posClass = "absolute top-10 right-1 sm:right-3"; 
       } else {
-        if (idx % 2 === 1) posClass = `absolute top-12 left-1.5 sm:left-4`;
-        else posClass = `absolute top-12 right-1.5 sm:right-4`;
+        if (idx % 2 === 1) posClass = `absolute top-10 left-1`;
+        else posClass = `absolute top-10 right-1`;
       }
     }
 
     seatArea.innerHTML += `
-      <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 sm:ring-4 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-xl p-1.5 sm:p-2.5 md:p-3 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
-        <div class="flex items-center justify-between text-[9px] sm:text-[11px] md:text-xs">
+      <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-lg sm:rounded-xl p-1 sm:p-2 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
+        <div class="flex items-center justify-between text-[8px] sm:text-[10px]">
           <span class="font-jua text-emerald-400 truncate">${p.name} ${isMe ? '(나)' : ''}</span>
           <span class="font-mono text-amber-300 font-bold">$${p.chips}</span>
         </div>
-        <div class="flex items-center justify-center gap-1.5 sm:gap-2 my-1">
+        <div class="flex items-center justify-center gap-1.5 my-0.5 sm:my-1">
           ${cardsHtml}
         </div>
-        <div class="text-center text-[9px] sm:text-[10px] md:text-xs text-amber-400 font-jua truncate">
+        <div class="text-center text-[8px] sm:text-[10px] text-amber-400 font-jua truncate">
           ${showCards ? handInfo.name : '비공개 카드'}
         </div>
-        <div class="flex items-center justify-between text-[9px] sm:text-[10px] md:text-xs text-slate-300 border-t border-slate-800 pt-0.5 mt-0.5">
+        <div class="flex items-center justify-between text-[8px] sm:text-[9px] text-slate-300 border-t border-slate-800 pt-0.5 mt-0.5">
           <span>벳: $${p.bet || 0}</span>
           <span class="${p.status === 'folded' ? 'text-rose-400' : 'text-emerald-400'} font-bold">${p.status}</span>
         </div>
