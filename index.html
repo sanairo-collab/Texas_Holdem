@@ -82,12 +82,12 @@
 
       <div class="flex flex-col items-center gap-1 mt-1">
         <div class="text-[9px] sm:text-[11px] text-amber-300/90 font-jua uppercase tracking-wider drop-shadow">공용 카드 (Community Cards)</div>
-        <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2 min-h-[44px] sm:min-h-[90px] items-center">
-          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
-          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
-          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
-          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
-          <div class="w-8 h-12 sm:w-16 sm:h-22 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+        <div id="communityCardsContainer" class="flex gap-1.5 sm:gap-2 min-h-[56px] sm:min-h-[96px] items-center">
+          <div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
+          <div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>
         </div>
       </div>
     </div>
@@ -96,22 +96,26 @@
       <!-- Dynamically filled by JS -->
     </div>
 
-  </div>
+    <!-- Split Action Control Bars: Left and Right side buttons so they never cover your player cards in the center -->
+    <div id="actionControlBar" class="absolute bottom-2 left-2 right-2 sm:left-4 sm:right-4 z-30 flex items-center justify-between gap-1 pointer-events-none">
+      <!-- Left Action Group (Start / Fold / Call / Check) -->
+      <div id="leftActionGroup" class="pointer-events-auto bg-slate-900/95 border border-amber-500/40 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 flex items-center gap-1 shadow-2xl backdrop-blur-md">
+        <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs shadow-xl transition active:scale-95">시작/딜</button>
+        <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">다이</button>
+        <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">콜/체크</button>
+      </div>
 
-  <div id="actionControlBar" class="bg-slate-900/95 border border-slate-800 rounded-xl sm:rounded-2xl p-2 sm:p-3 flex flex-wrap items-center justify-between gap-2 shrink-0 shadow-lg">
-    <div class="flex items-center gap-2">
-      <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-jua text-xs shadow transition active:scale-95">게임 시작 / 딜</button>
-      <span id="turnIndicator" class="text-xs text-amber-400 font-jua">내 차례 기다리는 중...</span>
-    </div>
-    
-    <div id="bettingControls" class="flex items-center gap-1.5 hidden">
-      <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-xs transition">다이 (Fold)</button>
-      <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-xs transition">콜 / 체크 (Call)</button>
-      <div class="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-xl border border-slate-800">
-        <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-14 sm:w-16 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
-        <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg font-jua text-xs transition">레이즈</button>
+      <!-- Right Action Group (Turn Indicator, Raise input & button) -->
+      <div class="flex items-center gap-1.5 pointer-events-auto">
+        <span id="turnIndicator" class="text-[9px] sm:text-[11px] text-amber-400 font-jua bg-slate-900/95 px-2.5 py-2 rounded-xl border border-amber-500/30 hidden shadow-xl whitespace-nowrap">대기 중...</span>
+        
+        <div id="rightActionGroup" class="bg-slate-900/95 border border-amber-500/40 rounded-xl sm:rounded-2xl p-1 sm:p-2 flex items-center gap-1 shadow-2xl backdrop-blur-md">
+          <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-10 sm:w-14 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
+          <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg font-jua text-[11px] sm:text-xs transition shadow">레이즈</button>
+        </div>
       </div>
     </div>
+
   </div>
 </main>
 
@@ -166,13 +170,20 @@ function initFirebaseApp() {
     document.getElementById("lobbyStatus").innerText = "Firebase 클라우드 연동 완료!";
   } catch (err) {
     console.error("Firebase init error:", err);
-    document.getElementById("lobbyStatus").innerText = "오프라인 모드 활성화";
+    document.getElementById("lobbyStatus").innerText = "Firebase 연동 실패 (오프라인 모드)";
   }
 }
 initFirebaseApp();
 
-function evaluateHand(playerCards, communityCards) {
-  const allCards = [...playerCards, ...communityCards];
+function evaluateHand(playerCards, communityCards, phase) {
+  let visibleCount = 0;
+  if (phase === 'preflop') visibleCount = 0;
+  else if (phase === 'flop') visibleCount = 3;
+  else if (phase === 'turn') visibleCount = 4;
+  else if (phase === 'river' || phase === 'showdown') visibleCount = 5;
+
+  const activeCommCards = communityCards.slice(0, visibleCount);
+  const allCards = [...playerCards, ...activeCommCards];
   if (allCards.length < 5) return { score: 0, name: '카드 부족' };
 
   let bestScore = -1;
@@ -353,14 +364,14 @@ function renderGame(data) {
       const c = commCards[i];
       const isRed = c.suit === '♥' || c.suit === '♦';
       commContainer.innerHTML += `
-        <div class="w-9 h-13 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col items-center justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-sm shadow-xl">
-          <div>${c.rank}</div>
-          <div class="text-base sm:text-2xl">${c.suit}</div>
-          <div class="rotate-180">${c.rank}</div>
+        <div class="w-9 h-14 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-base shadow-xl relative">
+          <div class="absolute top-1 left-1.5 text-xs sm:text-sm leading-none">${c.rank}</div>
+          <div class="absolute inset-0 flex items-center justify-center text-xl sm:text-3xl">${c.suit}</div>
+          <div class="absolute bottom-1 right-1.5 text-xs sm:text-sm leading-none rotate-180">${c.rank}</div>
         </div>
       `;
     } else {
-      commContainer.innerHTML += `<div class="w-9 h-13 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>`;
+      commContainer.innerHTML += `<div class="w-9 h-14 sm:w-14 sm:h-20 bg-slate-800/80 border border-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-[10px] sm:text-xs font-mono shadow-xl">?</div>`;
     }
   }
 
@@ -375,7 +386,7 @@ function renderGame(data) {
     
     let handInfo = { name: '비공개' };
     if (showCards && p.cards && p.cards.length === 2 && commCards.length === 5) {
-      handInfo = evaluateHand(p.cards, commCards);
+      handInfo = evaluateHand(p.cards, commCards, data.phase);
     }
 
     let cardsHtml = '';
@@ -383,22 +394,33 @@ function renderGame(data) {
       cardsHtml = p.cards.map(c => {
         const isRed = c.suit === '♥' || c.suit === '♦';
         if (isMe) {
-          return `<div class="w-14 h-18 sm:w-20 sm:h-26 bg-white border-2 border-amber-400 rounded-lg flex flex-col items-between justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-lg shadow-xl card-glow"><div>${c.rank}</div><div class="text-xl sm:text-3xl text-center my-auto">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+          return `
+            <div class="w-14 h-16 sm:w-22 sm:h-24 bg-white border-2 border-amber-400 rounded-xl flex flex-col justify-between p-1.5 sm:p-2 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-lg shadow-xl card-glow relative">
+              <div class="absolute top-1.5 left-2 text-xs sm:text-base leading-none">${c.rank}</div>
+              <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl">${c.suit}</div>
+              <div class="absolute bottom-1.5 right-2 text-xs sm:text-base leading-none rotate-180">${c.rank}</div>
+            </div>
+          `;
         } else {
-          // Fixed taller vertical height for opponent revealed cards to prevent text clipping
-          return `<div class="w-9 h-16 sm:w-12 sm:h-20 bg-white border border-slate-300 rounded-md flex flex-col items-between justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow"><div>${c.rank}</div><div class="text-sm sm:text-base text-center my-auto">${c.suit}</div><div class="rotate-180">${c.rank}</div></div>`;
+          return `
+            <div class="w-9 h-16 sm:w-12 sm:h-20 bg-white border border-slate-300 rounded-md flex flex-col justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow relative">
+              <div class="absolute top-1 left-1 text-[10px] sm:text-xs leading-none">${c.rank}</div>
+              <div class="absolute inset-0 flex items-center justify-center text-base sm:text-xl">${c.suit}</div>
+              <div class="absolute bottom-1 right-1 text-[10px] sm:text-xs leading-none rotate-180">${c.rank}</div>
+            </div>
+          `;
         }
       }).join('');
     } else {
       if (isMe) {
-        cardsHtml = `<div class="w-14 h-18 sm:w-20 sm:h-26 bg-slate-800/90 border border-slate-700 rounded-lg flex items-center justify-center text-slate-400 text-xs sm:text-base font-mono shadow-xl">🂠🂠</div>`;
+        cardsHtml = `<div class="w-14 h-16 sm:w-22 sm:h-24 bg-slate-800/90 border border-slate-700 rounded-xl flex items-center justify-center text-slate-400 text-xs sm:text-base font-mono shadow-xl">🂠🂠</div>`;
       } else {
         cardsHtml = `<div class="w-9 h-16 sm:w-12 sm:h-20 bg-slate-800/90 border border-slate-700 rounded-md flex items-center justify-center text-slate-400 text-[9px] font-mono shadow">🂠🂠</div>`;
       }
     }
 
-    let posClass = "absolute bottom-1 left-1/2 -translate-x-1/2 max-w-[95%]"; 
-    let boxWidth = "w-44 sm:w-68";
+    let posClass = "absolute bottom-2 left-1/2 -translate-x-1/2 max-w-[95%]"; 
+    let boxWidth = "w-48 sm:w-72";
     if (!isMe) {
       boxWidth = "w-24 sm:w-36";
       if (players.length === 3) {
@@ -424,7 +446,7 @@ function renderGame(data) {
         </div>
         <div class="flex items-center justify-between text-[8px] sm:text-[9px] text-slate-300 border-t border-slate-800 pt-0.5 mt-0.5">
           <span>벳: $${p.bet || 0}</span>
-          <span class="${p.status === 'folded' ? 'text-rose-400' : 'text-emerald-400'} font-bold">${p.status}</span>
+          <span class="${p.status === 'folded' ? 'text-rose-400' : p.status === 'eliminated' ? 'text-slate-500' : 'text-emerald-400'} font-bold">${p.status === 'eliminated' ? '파산 (패배)' : p.status}</span>
         </div>
       </div>
     `;
@@ -433,26 +455,34 @@ function renderGame(data) {
   const myIndex = players.findIndex(p => currentUserId && p.id === currentUserId);
   const isMyTurn = myIndex !== -1 && data.currentTurnIndex === myIndex && data.phase !== 'waiting' && data.phase !== 'showdown';
   
-  const bettingControls = document.getElementById("bettingControls");
+  const leftActionGroup = document.getElementById("leftActionGroup");
+  const rightActionGroup = document.getElementById("rightActionGroup");
   const turnIndicator = document.getElementById("turnIndicator");
   const startHandBtn = document.getElementById("startHandBtn");
 
   if (isMyTurn) {
-    bettingControls.classList.remove("hidden");
-    turnIndicator.innerText = "내 차례입니다!";
-    turnIndicator.className = "text-xs text-emerald-400 font-jua animate-pulse";
+    leftActionGroup.classList.remove("hidden");
+    rightActionGroup.classList.remove("hidden");
+    turnIndicator.classList.add("hidden");
   } else {
-    bettingControls.classList.add("hidden");
     const currP = players[data.currentTurnIndex];
-    turnIndicator.innerText = currP ? `${currP.name}님의 차례...` : "대기 중";
-    turnIndicator.className = "text-xs text-amber-400 font-jua";
+    if (data.phase === 'waiting' || data.phase === 'showdown') {
+      leftActionGroup.classList.remove("hidden");
+      rightActionGroup.classList.add("hidden");
+      turnIndicator.classList.add("hidden");
+    } else {
+      leftActionGroup.classList.remove("hidden");
+      rightActionGroup.classList.add("hidden");
+      turnIndicator.innerText = currP ? `${currP.name}님의 차례...` : "대기 중";
+      turnIndicator.classList.remove("hidden");
+    }
 
     if (isAiMode && currP && currP.id.startsWith('ai_bot') && data.phase !== 'waiting' && data.phase !== 'showdown') {
       setTimeout(runAiTurn, 1000);
     }
   }
 
-  startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'block' : 'none';
+  startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'inline-block' : 'none';
 }
 
 function createDeck() {
@@ -472,7 +502,27 @@ document.getElementById("startHandBtn").onclick = async () => {
   if (isAiMode) {
     if (!localAiGameState) return;
     let players = localAiGameState.players;
+    
+    // Check bankruptcy and filter out eliminated players from new hands
     players.forEach(p => {
+      if (p.chips <= 0) {
+        p.status = 'eliminated';
+      }
+    });
+
+    let activePlayers = players.filter(p => p.status !== 'eliminated');
+    if (activePlayers.length <= 1) {
+      let winner = activePlayers[0] || players[0];
+      showModal("🏆 게임 최종 우승", `${winner.name}님이 최종 승리하셨습니다!`, "👑");
+      return;
+    }
+
+    players.forEach(p => {
+      if (p.status === 'eliminated') {
+        p.cards = [];
+        p.bet = 0;
+        return;
+      }
       p.cards = [deck.pop(), deck.pop()];
       let ante = Math.min(10, p.chips);
       p.chips -= ante;
@@ -483,7 +533,10 @@ document.getElementById("startHandBtn").onclick = async () => {
 
     localAiGameState.pot = pot;
     localAiGameState.phase = 'preflop';
-    localAiGameState.currentTurnIndex = 0;
+    
+    // Find first active player
+    let firstActiveIdx = players.findIndex(p => p.status === 'active');
+    localAiGameState.currentTurnIndex = firstActiveIdx !== -1 ? firstActiveIdx : 0;
     localAiGameState.currentHighestBet = 10;
     localAiGameState.communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
     localAiGameState.lastRaiserIndex = -1;
@@ -498,12 +551,22 @@ document.getElementById("startHandBtn").onclick = async () => {
     const data = snap.data();
     let players = data.players || [];
 
-    if (players.length < 1) {
-      showModal("알림", "참여한 플레이어가 없습니다.", "⚠️");
+    players.forEach(p => {
+      if (p.chips <= 0) p.status = 'eliminated';
+    });
+
+    let activePlayers = players.filter(p => p.status !== 'eliminated');
+    if (activePlayers.length < 1) {
+      showModal("알림", "참여 가능한 플레이어가 없습니다.", "⚠️");
       return;
     }
 
     players.forEach(p => {
+      if (p.status === 'eliminated') {
+        p.cards = [];
+        p.bet = 0;
+        return;
+      }
       p.cards = [deck.pop(), deck.pop()];
       let ante = Math.min(10, p.chips);
       p.chips -= ante;
@@ -513,11 +576,12 @@ document.getElementById("startHandBtn").onclick = async () => {
     });
 
     let communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+    let firstActiveIdx = players.findIndex(p => p.status === 'active');
 
     await updateDoc(roomRef, {
       pot: pot,
       phase: 'preflop',
-      currentTurnIndex: 0,
+      currentTurnIndex: firstActiveIdx !== -1 ? firstActiveIdx : 0,
       currentHighestBet: 10,
       communityCards: communityCards,
       players: players,
@@ -611,12 +675,28 @@ function executeActionOnData(data, action, amount) {
     data.currentHighestBet = p.bet;
   }
 
-  let activePlayers = players.filter(pl => pl.status === 'active');
+  // Check if any player's chips dropped to 0 and mark eliminated if needed
+  players.forEach(pl => {
+    if (pl.chips <= 0 && pl.status !== 'eliminated' && pl.status !== 'folded') {
+      // If they went all in with 0 chips, they stay active for the hand unless folded
+    }
+  });
+
+  let activePlayers = players.filter(pl => pl.status === 'active' || (pl.chips === 0 && pl.status !== 'folded'));
+  let nonFoldedPlayers = players.filter(pl => pl.status !== 'folded' && pl.status !== 'eliminated');
   
-  if (activePlayers.length <= 1) {
-    let winner = activePlayers[0] || players[0];
-    winner.chips += data.pot;
-    showModal("🎉 게임 종료 (폴드 승리)", `승자: ${winner.name}\n획득 상금: $${data.pot}`, "🏆");
+  if (nonFoldedPlayers.length <= 1) {
+    let winner = nonFoldedPlayers[0] || players.find(pl => pl.status !== 'eliminated');
+    if (winner) {
+      winner.chips += data.pot;
+      showModal("🎉 게임 종료 (폴드 승리)", `승자: ${winner.name}\n획득 상금: $${data.pot}`, "🏆");
+    }
+    
+    // Check eliminations
+    players.forEach(pl => {
+      if (pl.chips <= 0) pl.status = 'eliminated';
+    });
+
     data.phase = 'showdown';
     return;
   }
@@ -624,15 +704,14 @@ function executeActionOnData(data, action, amount) {
   // Find next active player
   let nextIdx = (turnIdx + 1) % players.length;
   let loopCount = 0;
-  while (players[nextIdx].status === 'folded' && loopCount < players.length) {
+  while ((players[nextIdx].status === 'folded' || players[nextIdx].status === 'eliminated') && loopCount < players.length) {
     nextIdx = (nextIdx + 1) % players.length;
     loopCount++;
   }
 
   data.currentTurnIndex = nextIdx;
 
-  // Check if all active players have matched the highest bet (Round completion check)
-  let allMatched = activePlayers.every(pl => pl.bet === data.currentHighestBet);
+  let allMatched = nonFoldedPlayers.every(pl => pl.bet === data.currentHighestBet || pl.chips === 0);
 
   if (allMatched) {
     if (data.phase === 'preflop') {
@@ -646,11 +725,11 @@ function executeActionOnData(data, action, amount) {
       resetBetsForNextRound(players, data);
     } else if (data.phase === 'river') {
       let bestScore = -1;
-      let winner = activePlayers[0];
+      let winner = nonFoldedPlayers[0];
       let bestHandName = '';
 
-      activePlayers.forEach(pl => {
-        let evalRes = evaluateHand(pl.cards, data.communityCards);
+      nonFoldedPlayers.forEach(pl => {
+        let evalRes = evaluateHand(pl.cards, data.communityCards, data.phase);
         if (evalRes.score > bestScore) {
           bestScore = evalRes.score;
           winner = pl;
@@ -662,6 +741,11 @@ function executeActionOnData(data, action, amount) {
         winner.chips += data.pot;
         showModal("🏆 최종 쇼다운 결과", `승자: ${winner.name}!\n최고 족보: ${bestHandName}\n획득 상금: $${data.pot}`, "👑");
       }
+
+      players.forEach(pl => {
+        if (pl.chips <= 0) pl.status = 'eliminated';
+      });
+
       data.phase = 'showdown';
     }
   }
@@ -672,7 +756,7 @@ function resetBetsForNextRound(players, data) {
     if (p.status === 'active') p.bet = 0;
   });
   data.currentHighestBet = 0;
-  let firstActive = players.findIndex(p => p.status === 'active');
+  let firstActive = players.findIndex(p => p.status === 'active' && p.chips > 0);
   if (firstActive !== -1) data.currentTurnIndex = firstActive;
 }
 </script>
