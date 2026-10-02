@@ -292,7 +292,7 @@ document.getElementById("joinRoomBtn").onclick = async () => {
         bet: 0,
         cards: [],
         status: 'active',
-        isHost: players.length === 0
+        isHost: false
       });
       await updateDoc(roomRef, { players });
     }
@@ -424,17 +424,17 @@ function renderGame(data) {
     if (!isMe) {
       boxWidth = "w-28 sm:w-40";
       if (players.length === 3) {
-        if (idx === 1) posClass = "absolute top-2 left-1 sm:left-3"; 
-        else if (idx === 2) posClass = "absolute top-2 right-1 sm:right-3"; 
+        if (idx === 1) posClass = "absolute top-6 left-1 sm:left-3"; 
+        else if (idx === 2) posClass = "absolute top-6 right-1 sm:right-3"; 
       } else {
-        if (idx % 2 === 1) posClass = `absolute top-2 left-1`;
-        else posClass = `absolute top-2 right-1`;
+        if (idx % 2 === 1) posClass = `absolute top-6 left-1`;
+        else posClass = `absolute top-6 right-1`;
       }
     }
 
     seatArea.innerHTML += `
       <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-lg sm:rounded-xl p-1.5 sm:p-2.5 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
-        <div class="flex flex-col text-[9px] sm:text-[11px] leading-tight">
+        <div class="flex flex-col text-[10px] sm:text-[12px] leading-tight">
           <span class="font-jua text-emerald-400 truncate">${p.name} ${isMe ? '(나)' : ''}</span>
           <span class="font-mono text-amber-300 font-bold">$${p.chips}</span>
         </div>
@@ -483,7 +483,8 @@ function renderGame(data) {
   }
 
   if (startHandBtn) {
-    startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'inline-block' : 'none';
+    const isHostUser = players[0] && players[0].id === currentUserId;
+    startHandBtn.style.display = ((data.phase === 'waiting' || data.phase === 'showdown') && (isAiMode || isHostUser)) ? 'inline-block' : 'none';
   }
 }
 
@@ -506,9 +507,7 @@ document.getElementById("startHandBtn").onclick = async () => {
     let players = localAiGameState.players;
     
     players.forEach(p => {
-      if (p.chips <= 0) {
-        p.status = 'eliminated';
-      }
+      if (p.chips <= 0) p.status = 'eliminated';
     });
 
     let activePlayers = players.filter(p => p.status !== 'eliminated');
@@ -539,8 +538,6 @@ document.getElementById("startHandBtn").onclick = async () => {
     localAiGameState.currentTurnIndex = firstActiveIdx !== -1 ? firstActiveIdx : 0;
     localAiGameState.currentHighestBet = 10;
     localAiGameState.communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
-    localAiGameState.lastRaiserIndex = -1;
-    localAiGameState.actionsTakenThisRound = 0;
 
     renderGame(localAiGameState);
   } else {
@@ -584,9 +581,7 @@ document.getElementById("startHandBtn").onclick = async () => {
       currentTurnIndex: firstActiveIdx !== -1 ? firstActiveIdx : 0,
       currentHighestBet: 10,
       communityCards: communityCards,
-      players: players,
-      lastRaiserIndex: -1,
-      actionsTakenThisRound: 0
+      players: players
     });
   }
 };
@@ -612,7 +607,8 @@ async function handlePlayerAction(action, amount) {
     if (!localAiGameState) return;
     let p = localAiGameState.players[localAiGameState.currentTurnIndex];
     if (!currentUserId || p.id !== currentUserId) return;
-    await applyActionAndProceed(action, amount);
+    executeActionOnData(localAiGameState, action, amount);
+    renderGame(localAiGameState);
   } else {
     if (!db) return;
     const roomRef = doc(db, 'artifacts', appId, 'poker_rooms', currentRoomId);
@@ -627,13 +623,6 @@ async function handlePlayerAction(action, amount) {
     executeActionOnData(data, action, amount);
     await updateDoc(roomRef, data);
   }
-}
-
-async function applyActionAndProceed(action, amount) {
-  let data = localAiGameState;
-  if (!data) return;
-  executeActionOnData(data, action, amount);
-  renderGame(data);
 }
 
 function executeActionOnData(data, action, amount) {
@@ -659,13 +648,6 @@ function executeActionOnData(data, action, amount) {
     data.currentHighestBet = p.bet;
   }
 
-  players.forEach(pl => {
-    if (pl.chips <= 0 && pl.status !== 'eliminated' && pl.status !== 'folded') {
-      // All-in
-    }
-  });
-
-  let activePlayers = players.filter(pl => pl.status === 'active' || (pl.chips === 0 && pl.status !== 'folded'));
   let nonFoldedPlayers = players.filter(pl => pl.status !== 'folded' && pl.status !== 'eliminated');
   
   if (nonFoldedPlayers.length <= 1) {
@@ -734,10 +716,10 @@ function executeActionOnData(data, action, amount) {
 
 function resetBetsForNextRound(players, data) {
   players.forEach(p => {
-    if (p.status === 'active') p.bet = 0;
+    if (p.status === 'active' || p.chips === 0) p.bet = 0;
   });
   data.currentHighestBet = 0;
-  let firstActive = players.findIndex(p => p.status === 'active' && p.chips > 0);
+  let firstActive = players.findIndex(p => (p.status === 'active' || p.chips === 0) && p.status !== 'folded' && p.status !== 'eliminated');
   if (firstActive !== -1) data.currentTurnIndex = firstActive;
 }
 
