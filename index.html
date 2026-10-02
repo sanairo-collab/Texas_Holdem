@@ -96,21 +96,21 @@
       <!-- Dynamically filled by JS -->
     </div>
 
-    <!-- Split Action Control Bars: Left and Right side buttons so they never cover your player cards in the center -->
-    <div id="actionControlBar" class="absolute bottom-2 left-2 right-2 sm:left-4 sm:right-4 z-30 flex items-center justify-between gap-1 pointer-events-none">
-      <!-- Left Action Group (Start / Fold / Call / Check) -->
+    <!-- Split Action Control Bars: Lifted higher to avoid mobile browser status/nav bars -->
+    <div id="actionControlBar" class="absolute bottom-16 left-2 right-2 sm:bottom-20 sm:left-4 sm:right-4 z-30 flex items-center justify-between gap-1 pointer-events-none">
+      <!-- Left Action Group (Start Hand / Fold / Check-Call) -->
       <div id="leftActionGroup" class="pointer-events-auto bg-slate-900/95 border border-amber-500/40 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 flex items-center gap-1 shadow-2xl backdrop-blur-md">
         <button id="startHandBtn" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs shadow-xl transition active:scale-95">시작/딜</button>
-        <button id="foldBtn" class="bg-rose-600 hover:bg-rose-500 text-slate-950 font-black px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">다이</button>
-        <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">콜/체크</button>
+        <button id="foldBtn" class="bg-rose-700 hover:bg-rose-600 text-slate-100 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">다이 (Fold)</button>
+        <button id="checkCallBtn" class="bg-blue-600 hover:bg-blue-500 text-slate-950 font-black px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl font-jua text-[11px] sm:text-xs transition shadow">콜 (Call)</button>
       </div>
 
-      <!-- Right Action Group (Turn Indicator, Raise input & button) -->
+      <!-- Right Action Group (Turn Indicator, Raise amount input & button) -->
       <div class="flex items-center gap-1.5 pointer-events-auto">
         <span id="turnIndicator" class="text-[9px] sm:text-[11px] text-amber-400 font-jua bg-slate-900/95 px-2.5 py-2 rounded-xl border border-amber-500/30 hidden shadow-xl whitespace-nowrap">대기 중...</span>
         
         <div id="rightActionGroup" class="bg-slate-900/95 border border-amber-500/40 rounded-xl sm:rounded-2xl p-1 sm:p-2 flex items-center gap-1 shadow-2xl backdrop-blur-md">
-          <input type="number" id="raiseAmountInput" value="50" min="10" max="1000" class="w-10 sm:w-14 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
+          <input type="number" id="raiseAmountInput" value="30" min="10" max="1000" class="w-10 sm:w-14 bg-transparent text-emerald-400 text-xs font-mono font-bold text-center focus:outline-none">
           <button id="raiseBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg font-jua text-[11px] sm:text-xs transition shadow">레이즈</button>
         </div>
       </div>
@@ -364,7 +364,7 @@ function renderGame(data) {
       const c = commCards[i];
       const isRed = c.suit === '♥' || c.suit === '♦';
       commContainer.innerHTML += `
-        <div class="w-9 h-14 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-base shadow-xl relative">
+        <div class="w-9 h-14 sm:w-14 sm:h-20 bg-white border border-slate-300 rounded-lg flex flex-col justify-between items-center p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-base shadow-xl relative">
           <div class="absolute top-1 left-1.5 text-xs sm:text-sm leading-none">${c.rank}</div>
           <div class="absolute inset-0 flex items-center justify-center text-xl sm:text-3xl">${c.suit}</div>
           <div class="absolute bottom-1 right-1.5 text-xs sm:text-sm leading-none rotate-180">${c.rank}</div>
@@ -385,7 +385,7 @@ function renderGame(data) {
     const showCards = isMe || data.phase === 'showdown';
     
     let handInfo = { name: '비공개' };
-    if (showCards && p.cards && p.cards.length === 2 && commCards.length === 5) {
+    if (showCards && p.cards && p.cards.length === 2) {
       handInfo = evaluateHand(p.cards, commCards, data.phase);
     }
 
@@ -395,15 +395,15 @@ function renderGame(data) {
         const isRed = c.suit === '♥' || c.suit === '♦';
         if (isMe) {
           return `
-            <div class="w-14 h-16 sm:w-22 sm:h-24 bg-white border-2 border-amber-400 rounded-xl flex flex-col justify-between p-1.5 sm:p-2 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-lg shadow-xl card-glow relative">
+            <div class="w-14 h-16 sm:w-22 sm:h-24 bg-white border-2 border-amber-400 rounded-xl flex flex-col justify-between items-center p-1.5 sm:p-2 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-xs sm:text-lg shadow-xl card-glow relative">
               <div class="absolute top-1.5 left-2 text-xs sm:text-base leading-none">${c.rank}</div>
-              <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl">${c.suit}</div>
+              <div class="absolute inset-0 flex items-center justify-center text-xl sm:text-3xl">${c.suit}</div>
               <div class="absolute bottom-1.5 right-2 text-xs sm:text-base leading-none rotate-180">${c.rank}</div>
             </div>
           `;
         } else {
           return `
-            <div class="w-9 h-16 sm:w-12 sm:h-20 bg-white border border-slate-300 rounded-md flex flex-col justify-between p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow relative">
+            <div class="w-9 h-16 sm:w-12 sm:h-20 bg-white border border-slate-300 rounded-md flex flex-col justify-between items-center p-1 ${isRed ? 'text-rose-600' : 'text-slate-900'} font-bold text-[10px] sm:text-xs shadow relative">
               <div class="absolute top-1 left-1 text-[10px] sm:text-xs leading-none">${c.rank}</div>
               <div class="absolute inset-0 flex items-center justify-center text-base sm:text-xl">${c.suit}</div>
               <div class="absolute bottom-1 right-1 text-[10px] sm:text-xs leading-none rotate-180">${c.rank}</div>
@@ -419,10 +419,10 @@ function renderGame(data) {
       }
     }
 
-    let posClass = "absolute bottom-2 left-1/2 -translate-x-1/2 max-w-[95%]"; 
+    let posClass = "absolute bottom-32 sm:bottom-36 left-1/2 -translate-x-1/2 max-w-[95%]"; 
     let boxWidth = "w-48 sm:w-72";
     if (!isMe) {
-      boxWidth = "w-24 sm:w-36";
+      boxWidth = "w-28 sm:w-40";
       if (players.length === 3) {
         if (idx === 1) posClass = "absolute top-10 left-1 sm:left-3"; 
         else if (idx === 2) posClass = "absolute top-10 right-1 sm:right-3"; 
@@ -433,18 +433,18 @@ function renderGame(data) {
     }
 
     seatArea.innerHTML += `
-      <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-lg sm:rounded-xl p-1 sm:p-2 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
-        <div class="flex items-center justify-between text-[8px] sm:text-[10px]">
+      <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-lg sm:rounded-xl p-1.5 sm:p-2.5 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
+        <div class="flex flex-col text-[9px] sm:text-[11px] leading-tight">
           <span class="font-jua text-emerald-400 truncate">${p.name} ${isMe ? '(나)' : ''}</span>
           <span class="font-mono text-amber-300 font-bold">$${p.chips}</span>
         </div>
-        <div class="flex items-center justify-center gap-1.5 my-0.5 sm:my-1">
+        <div class="flex items-center justify-center gap-1.5 my-1 sm:my-1.5">
           ${cardsHtml}
         </div>
-        <div class="text-center text-[8px] sm:text-[10px] text-amber-400 font-jua truncate">
+        <div class="text-center text-[9px] sm:text-[11px] text-amber-400 font-jua truncate">
           ${showCards ? handInfo.name : '비공개 카드'}
         </div>
-        <div class="flex items-center justify-between text-[8px] sm:text-[9px] text-slate-300 border-t border-slate-800 pt-0.5 mt-0.5">
+        <div class="flex items-center justify-between text-[8px] sm:text-[10px] text-slate-300 border-t border-slate-800 pt-1 mt-1">
           <span>벳: $${p.bet || 0}</span>
           <span class="${p.status === 'folded' ? 'text-rose-400' : p.status === 'eliminated' ? 'text-slate-500' : 'text-emerald-400'} font-bold">${p.status === 'eliminated' ? '파산 (패배)' : p.status}</span>
         </div>
@@ -482,7 +482,9 @@ function renderGame(data) {
     }
   }
 
-  startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'inline-block' : 'none';
+  if (startHandBtn) {
+    startHandBtn.style.display = (data.phase === 'waiting' || data.phase === 'showdown') ? 'inline-block' : 'none';
+  }
 }
 
 function createDeck() {
@@ -503,7 +505,6 @@ document.getElementById("startHandBtn").onclick = async () => {
     if (!localAiGameState) return;
     let players = localAiGameState.players;
     
-    // Check bankruptcy and filter out eliminated players from new hands
     players.forEach(p => {
       if (p.chips <= 0) {
         p.status = 'eliminated';
@@ -534,7 +535,6 @@ document.getElementById("startHandBtn").onclick = async () => {
     localAiGameState.pot = pot;
     localAiGameState.phase = 'preflop';
     
-    // Find first active player
     let firstActiveIdx = players.findIndex(p => p.status === 'active');
     localAiGameState.currentTurnIndex = firstActiveIdx !== -1 ? firstActiveIdx : 0;
     localAiGameState.currentHighestBet = 10;
@@ -591,37 +591,21 @@ document.getElementById("startHandBtn").onclick = async () => {
   }
 };
 
-async function runAiTurn() {
-  if (!isAiMode || !localAiGameState) return;
-  let data = localAiGameState;
-  if (data.phase === 'waiting' || data.phase === 'showdown') return;
-  let turnIdx = data.currentTurnIndex;
-  let p = data.players[turnIdx];
-  if (!p || !p.id.startsWith('ai_bot')) return;
-
-  let diff = data.currentHighestBet - p.bet;
-  let action = 'call';
-  let raiseVal = 0;
-
-  const rand = Math.random();
-  if (diff > 150 && rand < 0.4) {
-    action = 'fold';
-  } else if (rand < 0.15 && p.chips > 100 && (data.actionsTakenThisRound || 0) < 3) {
-    action = 'raise';
-    raiseVal = 20;
-  } else {
-    action = 'call';
-  }
-
-  await applyActionAndProceed(action, raiseVal);
+const foldBtnElem = document.getElementById("foldBtn");
+if (foldBtnElem) {
+  foldBtnElem.onclick = async () => { await handlePlayerAction('fold', 0); };
 }
-
-document.getElementById("foldBtn").onclick = async () => { await handlePlayerAction('fold', 0); };
-document.getElementById("checkCallBtn").onclick = async () => { await handlePlayerAction('call', 0); };
-document.getElementById("raiseBtn").onclick = async () => {
-  const amount = parseInt(document.getElementById("raiseAmountInput").value) || 30;
-  await handlePlayerAction('raise', amount);
-};
+const checkCallBtnElem = document.getElementById("checkCallBtn");
+if (checkCallBtnElem) {
+  checkCallBtnElem.onclick = async () => { await handlePlayerAction('call', 0); };
+}
+const raiseBtnElem = document.getElementById("raiseBtn");
+if (raiseBtnElem) {
+  raiseBtnElem.onclick = async () => {
+    const amount = parseInt(document.getElementById("raiseAmountInput").value) || 30;
+    await handlePlayerAction('raise', amount);
+  };
+}
 
 async function handlePlayerAction(action, amount) {
   if (isAiMode) {
@@ -675,10 +659,9 @@ function executeActionOnData(data, action, amount) {
     data.currentHighestBet = p.bet;
   }
 
-  // Check if any player's chips dropped to 0 and mark eliminated if needed
   players.forEach(pl => {
     if (pl.chips <= 0 && pl.status !== 'eliminated' && pl.status !== 'folded') {
-      // If they went all in with 0 chips, they stay active for the hand unless folded
+      // All-in
     }
   });
 
@@ -692,7 +675,6 @@ function executeActionOnData(data, action, amount) {
       showModal("🎉 게임 종료 (폴드 승리)", `승자: ${winner.name}\n획득 상금: $${data.pot}`, "🏆");
     }
     
-    // Check eliminations
     players.forEach(pl => {
       if (pl.chips <= 0) pl.status = 'eliminated';
     });
@@ -701,7 +683,6 @@ function executeActionOnData(data, action, amount) {
     return;
   }
 
-  // Find next active player
   let nextIdx = (turnIdx + 1) % players.length;
   let loopCount = 0;
   while ((players[nextIdx].status === 'folded' || players[nextIdx].status === 'eliminated') && loopCount < players.length) {
@@ -758,6 +739,23 @@ function resetBetsForNextRound(players, data) {
   data.currentHighestBet = 0;
   let firstActive = players.findIndex(p => p.status === 'active' && p.chips > 0);
   if (firstActive !== -1) data.currentTurnIndex = firstActive;
+}
+
+function runAiTurn() {
+  if (!localAiGameState || localAiGameState.phase === 'waiting' || localAiGameState.phase === 'showdown') return;
+  let turnIdx = localAiGameState.currentTurnIndex;
+  let p = localAiGameState.players[turnIdx];
+  if (!p || !p.id.startsWith('ai_bot') || p.status === 'folded' || p.status === 'eliminated') return;
+
+  let diff = localAiGameState.currentHighestBet - p.bet;
+  if (diff === 0) {
+    executeActionOnData(localAiGameState, 'call', 0);
+  } else if (diff <= 30 && p.chips >= diff) {
+    executeActionOnData(localAiGameState, 'call', 0);
+  } else {
+    executeActionOnData(localAiGameState, 'fold', 0);
+  }
+  renderGame(localAiGameState);
 }
 </script>
 </body>
