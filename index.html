@@ -422,7 +422,7 @@ function renderGame(data) {
     let posClass = "absolute bottom-36 sm:bottom-40 left-1/2 -translate-x-1/2 max-w-[95%]"; 
     let boxWidth = "w-48 sm:w-72";
     if (!isMe) {
-      boxWidth = "w-28 sm:w-40";
+      boxWidth = "w-32 sm:w-44";
       if (players.length === 3) {
         if (idx === 1) posClass = "absolute top-6 left-1 sm:left-3"; 
         else if (idx === 2) posClass = "absolute top-6 right-1 sm:right-3"; 
@@ -434,11 +434,11 @@ function renderGame(data) {
 
     seatArea.innerHTML += `
       <div class="${posClass} pointer-events-auto bg-slate-900/95 border ${isCurrentTurn ? 'border-amber-400 ring-2 ring-amber-400/50 scale-102' : 'border-slate-800'} rounded-lg sm:rounded-xl p-1.5 sm:p-2.5 flex flex-col justify-between ${boxWidth} shadow-2xl transition-all duration-300 z-30">
-        <div class="flex flex-col text-[10px] sm:text-[12px] leading-tight">
+        <div class="flex flex-col text-[10px] sm:text-[12px] leading-tight mb-1">
           <span class="font-jua text-emerald-400 truncate">${p.name} ${isMe ? '(나)' : ''}</span>
           <span class="font-mono text-amber-300 font-bold">$${p.chips}</span>
         </div>
-        <div class="flex items-center justify-center gap-1.5 my-1 sm:my-1.5">
+        <div class="flex items-center justify-center gap-1.5 my-0.5 sm:my-1">
           ${cardsHtml}
         </div>
         <div class="text-center text-[9px] sm:text-[11px] text-amber-400 font-jua truncate">
@@ -528,12 +528,13 @@ document.getElementById("startHandBtn").onclick = async () => {
       p.chips -= ante;
       p.bet = ante;
       pot += ante;
-      p.status = 'active';
+      p.status = 'active'; // Reset to active so everyone needs to act
     });
 
     localAiGameState.pot = pot;
     localAiGameState.phase = 'preflop';
     
+    // In poker, preflop action starts to the left of the big blind (or dealer). Let's pick the first active player index.
     let firstActiveIdx = players.findIndex(p => p.status === 'active');
     localAiGameState.currentTurnIndex = firstActiveIdx !== -1 ? firstActiveIdx : 0;
     localAiGameState.currentHighestBet = 10;
@@ -569,7 +570,7 @@ document.getElementById("startHandBtn").onclick = async () => {
       p.chips -= ante;
       p.bet = ante;
       pot += ante;
-      p.status = 'active';
+      p.status = 'active'; // Reset to active so everyone needs to act
     });
 
     let communityCards = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
@@ -619,7 +620,11 @@ async function handlePlayerAction(action, amount) {
     let turnIdx = data.currentTurnIndex;
     let p = players[turnIdx];
 
-    if (!currentUserId || p.id !== currentUserId) return;
+    if (!currentUserId || p.id !== currentUserId) {
+      showModal("알림", "아직 당신의 차례가 아닙니다!", "⏳");
+      return;
+    }
+    
     executeActionOnData(data, action, amount);
     await updateDoc(roomRef, data);
   }
@@ -638,6 +643,7 @@ function executeActionOnData(data, action, amount) {
     p.chips -= pay;
     p.bet += pay;
     data.pot += pay;
+    p.status = 'called';
   } else if (action === 'raise') {
     let totalBet = data.currentHighestBet + amount;
     let diff = totalBet - p.bet;
@@ -646,6 +652,13 @@ function executeActionOnData(data, action, amount) {
     p.bet += pay;
     data.pot += pay;
     data.currentHighestBet = p.bet;
+    p.status = 'raised';
+    
+    players.forEach(pl => {
+      if (pl.id !== p.id && pl.status !== 'folded' && pl.status !== 'eliminated') {
+        pl.status = 'active';
+      }
+    });
   }
 
   let nonFoldedPlayers = players.filter(pl => pl.status !== 'folded' && pl.status !== 'eliminated');
@@ -667,16 +680,25 @@ function executeActionOnData(data, action, amount) {
 
   let nextIdx = (turnIdx + 1) % players.length;
   let loopCount = 0;
-  while ((players[nextIdx].status === 'folded' || players[nextIdx].status === 'eliminated') && loopCount < players.length) {
+  while (loopCount < players.length) {
+    let candidate = players[nextIdx];
+    if (candidate.status !== 'folded' && candidate.status !== 'eliminated' && candidate.chips > 0) {
+      if (candidate.bet < data.currentHighestBet || candidate.status === 'active') {
+        break;
+      }
+    }
     nextIdx = (nextIdx + 1) % players.length;
     loopCount++;
   }
 
   data.currentTurnIndex = nextIdx;
 
-  let allMatched = nonFoldedPlayers.every(pl => pl.bet === data.currentHighestBet || pl.chips === 0);
+  let roundComplete = nonFoldedPlayers.every(pl => pl.bet === data.currentHighestBet && pl.status !== 'active');
+  if (loopCount >= players.length && nonFoldedPlayers.every(pl => pl.bet === data.currentHighestBet)) {
+    roundComplete = true;
+  }
 
-  if (allMatched) {
+  if (roundComplete) {
     if (data.phase === 'preflop') {
       data.phase = 'flop';
       resetBetsForNextRound(players, data);
@@ -716,10 +738,13 @@ function executeActionOnData(data, action, amount) {
 
 function resetBetsForNextRound(players, data) {
   players.forEach(p => {
-    if (p.status === 'active' || p.chips === 0) p.bet = 0;
+    if (p.status !== 'folded' && p.status !== 'eliminated') {
+      p.bet = 0;
+      p.status = 'active';
+    }
   });
   data.currentHighestBet = 0;
-  let firstActive = players.findIndex(p => (p.status === 'active' || p.chips === 0) && p.status !== 'folded' && p.status !== 'eliminated');
+  let firstActive = players.findIndex(p => p.status !== 'folded' && p.status !== 'eliminated');
   if (firstActive !== -1) data.currentTurnIndex = firstActive;
 }
 
